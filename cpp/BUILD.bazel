@@ -13,21 +13,33 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-package(default_visibility = ["//visibility:public"])
+load("//:plugin.bzl", "proto_plugin")
+load(":cpp_grpc_library.bzl", "cpp_grpc_library")
 
-proto_library(
-    name = "rocketmq_v2_proto",
-    srcs = glob(["apache/rocketmq/v2/*.proto"]),
-    deps = [
-        "@com_google_protobuf//:empty_proto",
-        "@com_google_protobuf//:field_mask_proto",
-        "@com_google_protobuf//:duration_proto",
-        "@com_google_protobuf//:timestamp_proto",
-        "@com_google_googleapis//google/rpc:code_proto",
-        "@com_google_googleapis//google/rpc:error_details_proto",
-        "@com_google_googleapis//google/rpc:status_proto",
-    ]
+proto_plugin(
+    name = "cpp",
+    outputs = [
+        "{basename}.pb.h",
+        "{basename}.pb.cc",
+    ],
+    visibility = ["//visibility:public"],
 )
 
+proto_plugin(
+    name = "grpc_cpp",
+    options = [
+        "generate_mock_code=true",
+    ],
+    outputs = [
+        "{basename}.grpc.pb.h",
+        "{basename}.grpc.pb.cc",
+        "{basename}_mock.grpc.pb.h",
+    ],
+    tool = "@com_github_grpc_grpc//src/compiler:grpc_cpp_plugin",
+    visibility = ["//visibility:public"],
+)
 
-
+cpp_grpc_library(
+    name = "rocketmq-proto-cpp-library",
+    deps = ["//:rocketmq_v2_proto"]
+)

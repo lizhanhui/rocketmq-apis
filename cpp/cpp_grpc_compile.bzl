@@ -13,21 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-package(default_visibility = ["//visibility:public"])
+load("//:compile.bzl", "proto_compile")
 
-proto_library(
-    name = "rocketmq_v2_proto",
-    srcs = glob(["apache/rocketmq/v2/*.proto"]),
-    deps = [
-        "@com_google_protobuf//:empty_proto",
-        "@com_google_protobuf//:field_mask_proto",
-        "@com_google_protobuf//:duration_proto",
-        "@com_google_protobuf//:timestamp_proto",
-        "@com_google_googleapis//google/rpc:code_proto",
-        "@com_google_googleapis//google/rpc:error_details_proto",
-        "@com_google_googleapis//google/rpc:status_proto",
-    ]
-)
-
-
-
+def cpp_grpc_compile(**kwargs):
+    proto_compile(
+        plugins = [
+            str(Label("//cpp:cpp")),
+            str(Label("//cpp:grpc_cpp")),
+        ],
+        **kwargs
+    )
